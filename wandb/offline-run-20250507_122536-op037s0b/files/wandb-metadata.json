@@ -1,0 +1,37 @@
+{
+  "os": "Windows-10-10.0.22631",
+  "python": "CPython 3.9.8",
+  "startedAt": "2025-05-07T06:55:36.524631Z",
+  "program": "D:\\DotNeuralNet-main\\DotNeuralNet-main\\src\\train.py",
+  "codePath": "src\\train.py",
+  "root": ".",
+  "host": "LAPTOP-BAI0TVQ8",
+  "executable": "D:\\DotNeuralNet-main\\DotNeuralNet-main\\venv\\Scripts\\python.exe",
+  "codePathLocal": "src\\train.py",
+  "cpu_count": 6,
+  "cpu_count_logical": 12,
+  "gpu": "NVIDIA GeForce GTX 1650",
+  "gpu_count": 1,
+  "disk": {
+    "/": {
+      "total": "273236881408",
+      "used": "31774924800"
+    }
+  },
+  "memory": {
+    "total": "7968075776"
+  },
+  "cpu": {
+    "count": 6,
+    "countLogical": 12
+  },
+  "gpu_nvidia": [
+    {
+      "name": "NVIDIA GeForce GTX 1650",
+      "memoryTotal": "4294967296",
+      "cudaCores": 896,
+      "architecture": "Turing"
+    }
+  ],
+  "cudaVersion": "12.7"
+}
