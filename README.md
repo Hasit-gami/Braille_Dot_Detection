@@ -64,7 +64,7 @@ pip install -r requirements.txt  # install
 ### How to Run
 
 - Please refer to `src/inference.py` or `src/demo.py` to run the model.
-- For online demo, please visit [🔗 Streamlit demo](https://huggingface.co/spaces/snoop2head/braille-detection).
+- For online demo, please visit [🔗 Streamlit demo](https://huggingface.co/Prakash999/Braille_Dot_Detection).
 
 ```python
 import PIL
