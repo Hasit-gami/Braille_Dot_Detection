@@ -1,50 +1,88 @@
 import streamlit as st
-import PIL
+from PIL import Image, UnidentifiedImageError
 from ultralytics import YOLO
-from convert import convert_to_braille_unicode, parse_xywh_and_class, translate_braille_to_english
-import numpy as np
 
-st.title("Braille Detection and Recognition")
+from convert import (
+    convert_to_braille_unicode,
+    parse_xywh_and_class,
+    translate_braille_to_english,
+)
 
-# Constants
 MODEL_PATH = "./weights/yolov8_braille.pt"
-DEFAULT_IMAGE_PATH = "./assets/braille dots.jpeg"
 CONFIDENCE_THRESHOLD = 0.15
+
 
 @st.cache_resource
 def load_model():
-    model = YOLO(MODEL_PATH)
-    return model
+    return YOLO(MODEL_PATH)
+
 
 def run_inference(model, image):
-    res = model.predict(image, conf=CONFIDENCE_THRESHOLD)
-    boxes = res[0].boxes
-    list_boxes = parse_xywh_and_class(boxes)
-    result = ""
-    for box_line in list_boxes:
-        str_left_to_right = ""
-        box_classes = box_line[:, -1]
-        for each_class in box_classes:
-            str_left_to_right += convert_to_braille_unicode(model.names[int(each_class)])
-        result += str_left_to_right + "\n"
-    return result
+    results = model.predict(image, conf=CONFIDENCE_THRESHOLD)
+    boxes = results[0].boxes
+
+    if boxes is None or len(boxes) == 0:
+        return ""
+
+    box_lines = parse_xywh_and_class(boxes)
+    translated_lines = []
+
+    for box_line in box_lines:
+        line = ""
+
+        for class_id in box_line[:, -1]:
+            line += convert_to_braille_unicode(
+                model.names[int(class_id)]
+            )
+
+        translated_lines.append(line)
+
+    return "\n".join(translated_lines)
+
+
+st.title("Braille Detection and Recognition")
+st.write("Upload a clear JPG or PNG image containing Braille.")
 
 model = load_model()
 
-uploaded_file = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
+uploaded_file = st.file_uploader(
+    "Upload an image",
+    type=["jpg", "jpeg", "png"],
+)
 
-if uploaded_file is not None:
-    image = PIL.Image.open(uploaded_file)
-else:
-    image = PIL.Image.open(DEFAULT_IMAGE_PATH)
-    st.info("Using default image")
+if uploaded_file is None:
+    st.info("Upload an image to begin.")
+    st.stop()
 
-st.image(image, caption="Input Image", use_column_width=True)
+try:
+    image = Image.open(uploaded_file).convert("RGB")
+except (UnidentifiedImageError, OSError):
+    st.error("The selected file is not a valid image.")
+    st.stop()
 
-if st.button("Run Inference"):
-    with st.spinner("Running inference..."):
+st.image(
+    image,
+    caption="Input image",
+    use_container_width=True,
+)
+
+if st.button("Run Inference", type="primary"):
+    with st.spinner("Running Braille recognition..."):
         braille_text = run_inference(model, image)
-    st.success("Inference complete!")
-    st.text_area("Detected Braille Unicode Text", braille_text, height=150)
-    english_text = translate_braille_to_english(braille_text)
-    st.text_area("Translated English Text", english_text, height=150)
+
+    if not braille_text.strip():
+        st.warning("No Braille characters were detected in this image.")
+    else:
+        english_text = translate_braille_to_english(braille_text)
+
+        st.success("Inference complete!")
+        st.text_area(
+            "Detected Braille Unicode Text",
+            braille_text,
+            height=150,
+        )
+        st.text_area(
+            "Translated English Text",
+            english_text,
+            height=150,
+        )
