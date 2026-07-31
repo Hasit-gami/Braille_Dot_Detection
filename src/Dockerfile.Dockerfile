@@ -13,4 +13,4 @@ COPY . .
 # Railway/most PaaS providers inject $PORT — Streamlit must bind to it,
 # not to its default 8501, or the platform's proxy won't find it.
 EXPOSE 8080
-CMD streamlit run app.py --server.port=${PORT:-8080} --server.address=0.0.0.0
+CMD ["sh", "-c", "streamlit run src/app.py --server.port=${PORT:-8080} --server.address=0.0.0.0"]
